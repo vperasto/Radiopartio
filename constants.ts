@@ -9,28 +9,52 @@ export const CALLSIGNS: Callsign[] = [
 export const MANUAL_PAGES: ManualPage[] = [
   {
     id: 1,
-    title: "1. KUTSU JA KUITAUS",
+    title: "1. KUTSUKAAVA",
     icon: "Radio",
-    content: "Radiossa ei huudeta päällekkäin. Aloita viesti aina kaavalla:\n\nKENELLE - KENELTÄ\n\nEsimerkki: 'Tukikohta, täällä Haukka.'\n\nKun olet ymmärtänyt viestin, sano: 'Kuitti'.\nKun lopetat puhumisen, sano: 'Loppu'."
+    content: "Radiossa ei huudeta 'haloo'.\nKäytä aina tätä kaavaa:\n\n1. KENELLE (Vastaanottaja)\n2. KENELTÄ (Sinä)\n\nEsimerkki: 'Tukikohta, täällä Haukka.'"
   },
   {
     id: 2,
     title: "2. NAPPIKURI",
     icon: "Mic",
-    content: "Radiossa on pieni viive. Jos puhut heti, sanan alku jää pois.\n\nTÄRKEÄ SÄÄNTÖ:\n1. Paina nappi pohjaan.\n2. Laske mielessä 'Yksi'.\n3. Aloita puhuminen vasta sitten."
+    content: "Radio on hitaampi kuin puhelin.\n\nOIKEA TYYLI:\n1. Paina nappi pohjaan.\n2. Laske mielessä 'YKSI'.\n3. Puhu vasta sitten.\n\nJos puhut heti, viestin alku leikkaantuu pois!"
   },
   {
     id: 3,
-    title: "3. TIETOTURVA",
+    title: "3. SALAISUUDET",
     icon: "ShieldAlert",
-    content: "Kuka tahansa voi kuunnella radiota. Siksi meillä on säännöt:\n\n- Älä koskaan sano oikeaa nimeäsi. Käytä koodinimeä (Haukka, Karhu).\n- Älä kerro tarkkaa osoitetta. Käytä salasanoja kuten 'Maja' tai 'Bunkkeri'."
+    content: "Radiota voi kuunnella kuka vain.\n\nSiksi meillä on säännöt:\n- Älä koskaan sano omaa nimeäsi.\n- Älä kerro kotiosoitetta.\n\nKäytä aina koodinimiä!"
   },
   {
     id: 4,
     title: "4. VÄRIKOODIT",
     icon: "Siren",
-    content: "Jos jotain tapahtuu, käytä värejä:\n\n🟢 VIHREÄ: Kaikki hyvin.\n🟡 KELTAINEN: Jotain outoa / Epäilyttävää.\n🔴 PUNAINEN: Hätä! Tapaturma! (Leikki loppuu heti ja aikuinen tulee paikalle)."
+    content: "Ilmoita tilanne väreillä:\n\n🟢 VIHREÄ: Kaikki ok.\n🟡 KELTAINEN: Jotain outoa (ilmoita heti).\n🔴 PUNAINEN: HÄTÄ! (Ei leikkiä! Nyt tarvitaan aikuista)."
+  },
+  {
+    id: 5,
+    title: "5. KUITTI & LOPPU",
+    icon: "CheckCircle2",
+    content: "Nämä ovat kaksi eri asiaa:\n\nKUITTI = 'Ymmärsin viestisi.'\nLOPPU = 'Lopetin puhumisen, sinun vuorosi.'\n\nSano 'LOPPU', jotta kaveri tietää milloin saa painaa nappia!"
+  },
+  {
+    id: 6,
+    title: "6. TÄRKEÄ SÄÄNTÖ",
+    icon: "Wifi",
+    content: "Älä koskaan kanna radiota sen antennista!\n\nAntenni on radion herkin osa. Jos se vääntyy sisältä, äänesi ei lennä enää perille.\n\nPidä kiinni vain laitteen rungosta."
   }
+];
+
+export const RADIO_FACTS = [
+    "Lentäjät sanovat 'Roger', mikä tarkoittaa 'Viesti saatu'. R-kirjain on aakkosissa nykyään 'Romeo', mutta kuittauksena käytetään yhä vanhaa kunnon 'Rogeria'!",
+    "Radioaallot eivät tykkää taloista tai mäistä. Jos yhteys pätkii, kiipeä korkeammalle kivelle tai mene ikkunaan. Ylhäältä kuuluu kauemmas!",
+    "Radiopuhelimen keksi kanadalainen Donald Hings vuonna 1937. Sitä kutsuttiin aluksi nimellä 'packset'.",
+    "Radiopuhelin on 'Simplex'-laite. Se tarkoittaa, että vain yksi voi puhua kerrallaan. Jos painatte nappia yhtä aikaa, kuuluu vain surinaa.",
+    "Avaruudessa ei ole ilmaa, joten ääni ei kulje ilman radiota. Astronautit ovat radioammattilaisia!",
+    "Sotilaat ja poliisit käyttävät radiokieltä, jotta viestit olisivat lyhyitä ja selkeitä melussa.",
+    "Radioaallot kulkevat valon nopeudella. Viestisi on perillä melkein heti!",
+    "Sana 'Mayday' (hätäkutsu) tulee ranskan kielen sanasta 'm'aidez', mikä tarkoittaa 'auta minua'.",
+    "Jos sanot radiossa 'Toista', kaveri kertoo asian uudestaan. Radiokieli on tehty helpoksi.",
 ];
 
 export const INITIAL_QUESTION_BANK: QuestionCategory[] = [

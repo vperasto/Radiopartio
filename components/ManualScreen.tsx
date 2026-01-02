@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Mic, ShieldAlert, Siren, ArrowRight, BookOpen } from 'lucide-react';
-import { MANUAL_PAGES } from '../constants';
+import { Radio, Mic, ShieldAlert, Siren, ArrowRight, BookOpen, Sparkles, CheckCircle2, Wifi } from 'lucide-react';
+import { MANUAL_PAGES, RADIO_FACTS } from '../constants';
 import { Callsign } from '../types';
 
 interface ManualScreenProps {
@@ -14,10 +14,19 @@ const iconMap: Record<string, React.ElementType> = {
   Mic,
   ShieldAlert,
   Siren,
+  CheckCircle2,
+  Wifi
 };
 
 const ManualScreen: React.FC<ManualScreenProps> = ({ callsign, onComplete }) => {
   const [pageIndex, setPageIndex] = useState(0);
+  const [randomFact, setRandomFact] = useState<string>('');
+
+  useEffect(() => {
+    // Select a random fact for this session
+    const fact = RADIO_FACTS[Math.floor(Math.random() * RADIO_FACTS.length)];
+    setRandomFact(fact);
+  }, []);
 
   const currentPage = MANUAL_PAGES[pageIndex];
   const isLastPage = pageIndex === MANUAL_PAGES.length - 1;
@@ -49,7 +58,7 @@ const ManualScreen: React.FC<ManualScreenProps> = ({ callsign, onComplete }) => 
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col justify-center p-6 pb-24">
+      <div className="flex-1 flex flex-col justify-start md:justify-center p-6 pb-32 md:pb-24 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage.id}
@@ -57,11 +66,11 @@ const ManualScreen: React.FC<ManualScreenProps> = ({ callsign, onComplete }) => 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex flex-col items-center text-center space-y-8"
+            className="flex flex-col items-center text-center space-y-6 md:space-y-8 mt-4 md:mt-0"
           >
             {/* Icon Circle */}
-            <div className="w-24 h-24 rounded-full border-2 border-slate-600 flex items-center justify-center bg-slate-800/50 relative">
-               <IconComponent size={48} className="text-emerald-500" />
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-slate-600 flex items-center justify-center bg-slate-800/50 relative">
+               <IconComponent size={40} className="text-emerald-500" />
                <div className="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
             </div>
 
@@ -71,11 +80,24 @@ const ManualScreen: React.FC<ManualScreenProps> = ({ callsign, onComplete }) => 
             </h2>
 
             {/* Text Content */}
-            <div className="bg-slate-800/30 border border-slate-700 p-8 rounded-sm w-full text-left max-w-2xl">
+            <div className="bg-slate-800/30 border border-slate-700 p-6 md:p-8 rounded-sm w-full text-left max-w-2xl">
               <p className="font-mono text-base md:text-lg leading-relaxed whitespace-pre-line text-slate-300">
                 {currentPage.content}
               </p>
             </div>
+            
+            {/* Random Fact Box (Only visible on last page or statically at bottom) */}
+            {/* We show it on all pages to keep it interesting, or just the first? Let's show it statically at the bottom of the content area */}
+            <div className="w-full max-w-2xl mt-4 border border-dashed border-slate-600 bg-slate-900/50 p-4 rounded-sm flex gap-3 items-start">
+                <Sparkles size={18} className="text-amber-400 shrink-0 mt-1" />
+                <div className="text-left">
+                    <span className="text-xs text-amber-400 font-bold uppercase block mb-1">SALAINEN TIETOISKU:</span>
+                    <p className="text-xs md:text-sm text-slate-400 font-mono italic leading-relaxed">
+                        "{randomFact}"
+                    </p>
+                </div>
+            </div>
+
           </motion.div>
         </AnimatePresence>
       </div>
