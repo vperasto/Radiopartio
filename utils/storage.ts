@@ -1,10 +1,12 @@
+
 import { GameHistory, QuestionCategory } from '../types';
 import { INITIAL_QUESTION_BANK } from '../constants';
 
 const KEYS = {
   USERS: 'radiopartio_users',
   HISTORY: 'radiopartio_history',
-  QUESTIONS: 'radiopartio_questions_v2', // v2 to avoid conflicts with old format if any
+  QUESTIONS: 'radiopartio_questions_v4', // Updated to v4 for content expansion
+  AVATARS: 'radiopartio_avatars',
 };
 
 export const StorageUtils = {
@@ -22,6 +24,20 @@ export const StorageUtils = {
       users.push(name);
       localStorage.setItem(KEYS.USERS, JSON.stringify(users));
     }
+  },
+
+  // --- AVATARS ---
+  getUserAvatar: (user: string): string => {
+      const data = localStorage.getItem(KEYS.AVATARS);
+      const avatars = data ? JSON.parse(data) : {};
+      return avatars[user] || 'default';
+  },
+
+  saveUserAvatar: (user: string, avatarId: string) => {
+      const data = localStorage.getItem(KEYS.AVATARS);
+      const avatars = data ? JSON.parse(data) : {};
+      avatars[user] = avatarId;
+      localStorage.setItem(KEYS.AVATARS, JSON.stringify(avatars));
   },
 
   // --- HISTORY ---
@@ -61,6 +77,7 @@ export const StorageUtils = {
       users: StorageUtils.getUsers(),
       history: StorageUtils.getHistory(),
       questions: StorageUtils.getQuestionBank(),
+      avatars: localStorage.getItem(KEYS.AVATARS) ? JSON.parse(localStorage.getItem(KEYS.AVATARS)!) : {}
     };
   },
 
@@ -70,6 +87,7 @@ export const StorageUtils = {
       if (data.users) localStorage.setItem(KEYS.USERS, JSON.stringify(data.users));
       if (data.history) localStorage.setItem(KEYS.HISTORY, JSON.stringify(data.history));
       if (data.questions) localStorage.setItem(KEYS.QUESTIONS, JSON.stringify(data.questions));
+      if (data.avatars) localStorage.setItem(KEYS.AVATARS, JSON.stringify(data.avatars));
       return true;
     } catch (e) {
       console.error("Import failed", e);

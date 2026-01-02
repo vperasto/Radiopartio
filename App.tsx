@@ -1,12 +1,11 @@
+
 import React, { useState } from 'react';
 import { GameState, Callsign } from './types';
-import { INITIAL_QUESTION_BANK } from './constants';
 import { StorageUtils } from './utils/storage';
 import UserSelectScreen from './components/UserSelectScreen';
 import StartScreen from './components/StartScreen';
-import GameScreen from './components/GameScreen';
 import ResultScreen from './components/ResultScreen';
-import ManualScreen from './components/ManualScreen';
+import TrainingSession from './components/TrainingSession';
 import AdminPanel from './components/AdminPanel';
 
 const App: React.FC = () => {
@@ -14,6 +13,12 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [callsign, setCallsign] = useState<Callsign | null>(null);
   const [finalScore, setFinalScore] = useState(0);
+  const [totalQuestionsPlayed, setTotalQuestionsPlayed] = useState(0);
+
+  // Get user history for rank calculations
+  const userHistory = currentUser ? StorageUtils.getUserHistory(currentUser) : [];
+  const passedCount = userHistory.filter(h => h.passed).length;
+  const hasCompletedBefore = passedCount > 0;
 
   const handleUserSelect = (user: string) => {
     setCurrentUser(user);
@@ -27,15 +32,13 @@ const App: React.FC = () => {
 
   const handleStart = (selectedCallsign: Callsign) => {
     setCallsign(selectedCallsign);
-    setGameState('MANUAL');
+    // Instead of separating Manual/Playing, we use a single session state
+    setGameState('MANUAL'); 
   };
 
-  const handleManualComplete = () => {
-    setGameState('PLAYING');
-  };
-
-  const handleGameComplete = (score: number) => {
+  const handleGameComplete = (score: number, totalQuestions: number) => {
     setFinalScore(score);
+    setTotalQuestionsPlayed(totalQuestions);
     
     // Save Result
     if (currentUser && callsign) {
@@ -45,8 +48,8 @@ const App: React.FC = () => {
             user: currentUser,
             callsign: callsign,
             score: score,
-            total: INITIAL_QUESTION_BANK.length, // Rough estimate based on bank categories
-            passed: score / INITIAL_QUESTION_BANK.length >= 0.7
+            total: totalQuestions, // Save the actual number of questions played in this specific session
+            passed: score / totalQuestions >= 0.7
         });
     }
 
@@ -57,6 +60,7 @@ const App: React.FC = () => {
     setGameState('START');
     setCallsign(null);
     setFinalScore(0);
+    setTotalQuestionsPlayed(0);
   };
 
   const handleLogout = () => {
@@ -64,10 +68,11 @@ const App: React.FC = () => {
     setCurrentUser(null);
     setCallsign(null);
     setFinalScore(0);
+    setTotalQuestionsPlayed(0);
   };
 
   return (
-    <div className="bg-slate-900 min-h-screen text-slate-200 selection:bg-emerald-500 selection:text-slate-900 relative">
+    <div className="bg-slate-900 min-h-screen text-slate-200 selection:bg-emerald-500 selection:text-slate-900 relative overflow-hidden">
       
       {gameState === 'USER_SELECT' && (
         <UserSelectScreen 
@@ -84,24 +89,22 @@ const App: React.FC = () => {
         <StartScreen onSelectCallsign={handleStart} />
       )}
 
-      {gameState === 'MANUAL' && callsign && (
-        <ManualScreen 
+      {/* Unified Training Session Component */}
+      {(gameState === 'MANUAL' || gameState === 'PLAYING') && callsign && currentUser && (
+        <TrainingSession 
             callsign={callsign}
-            onComplete={handleManualComplete}
-        />
-      )}
-      
-      {gameState === 'PLAYING' && callsign && (
-        <GameScreen 
-          callsign={callsign} 
-          onGameComplete={handleGameComplete} 
+            currentUser={currentUser}
+            passedGamesCount={passedCount}
+            hasCompletedBefore={hasCompletedBefore}
+            onGameComplete={handleGameComplete}
+            onExit={handleRestart}
         />
       )}
 
       {gameState === 'FINISHED' && callsign && (
         <ResultScreen 
           score={finalScore} 
-          total={INITIAL_QUESTION_BANK.length} 
+          total={totalQuestionsPlayed} // Pass the dynamic total
           callsign={callsign} 
           onRestart={handleRestart} 
           onLogout={handleLogout}

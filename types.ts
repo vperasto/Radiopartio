@@ -1,3 +1,4 @@
+
 export type GameState = 'USER_SELECT' | 'START' | 'MANUAL' | 'PLAYING' | 'FINISHED' | 'ADMIN_DASHBOARD';
 
 export type Callsign = 'Haukka' | 'Karhu' | 'Susi' | 'Ilves' | 'Salama' | 'Myrsky' | 'Kallio' | 'Varjo' | 'Kaiku' | 'Halla';
@@ -27,6 +28,7 @@ export interface QuestionVariant {
 export interface QuestionCategory {
   id: string;
   title: string; // e.g., "PROTOKOLLA"
+  requiredRankId?: string; // New: Which rank (R0, R1...) is required to see these questions
   variants: QuestionVariant[];
 }
 
@@ -42,6 +44,7 @@ export interface ManualPage {
   title: string;
   icon: string;
   content: string;
+  requiredRankId?: string; // NEW: Leveled manual content
 }
 
 export interface GameHistory {
@@ -56,6 +59,12 @@ export interface GameHistory {
 
 export interface UserProfile {
   name: string;
-  gamesPlayed: number;
-  totalScore: number;
+  avatarId?: string; // New: ID for the selected icon
+}
+
+export interface Rank {
+  id: string;
+  title: string;
+  minPassed: number; // Minimum passed games to reach this rank
+  icon: string;
 }
