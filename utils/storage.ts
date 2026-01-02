@@ -5,7 +5,7 @@ import { INITIAL_QUESTION_BANK } from '../constants';
 const KEYS = {
   USERS: 'radiopartio_users',
   HISTORY: 'radiopartio_history',
-  QUESTIONS: 'radiopartio_questions_v4', // Updated to v4 for content expansion
+  QUESTIONS: 'radiopartio_questions_v5', // Updated to v5 for Mayday removal
   AVATARS: 'radiopartio_avatars',
 };
 

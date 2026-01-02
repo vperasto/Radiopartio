@@ -122,10 +122,10 @@ export const MANUAL_PAGES: ManualPage[] = [
   // --- RANK 3 (OPERAATTORI) - NEW CONTENT: Emergency & Leadership ---
   {
     id: 12,
-    title: "1. HÄTÄKUTSU (MAYDAY)",
+    title: "1. HÄTÄTILANNE",
     icon: "AlertTriangle",
     requiredRankId: "R3",
-    content: "Vain oikeaan hätään (hengenvaara).\n\nSano kolme kertaa:\n'MAYDAY, MAYDAY, MAYDAY.'\n\nSen jälkeen kerro:\n1. Kuka olet\n2. Missä olet\n3. Mikä on hätänä.\n\nKaikki muut vaikenevat heti."
+    content: "Jos sattuu oikea onnettomuus:\n\n1. Pysy rauhallisena.\n2. Kutsu Tukikohtaa sanalla 'HÄTÄ'.\n\nEsimerkki: 'TUKIKOHTA, TÄÄLLÄ HAUKKA. HÄTÄ. Kaveri loukkaantui.'\n\nÄlä koskaan leiki hätätilannetta radiossa."
   },
   {
     id: 13,
@@ -148,7 +148,6 @@ export const RADIO_FACTS = [
     "Radioaallot eivät tykkää taloista tai mäistä. Kiipeä korkealle!",
     "Radiopuhelin on 'Simplex'-laite. Vain yksi voi puhua kerrallaan.",
     "Avaruudessa ei ole ilmaa, joten siellä tarvitaan radiota jutteluun.",
-    "Sana 'Mayday' tulee ranskasta 'm'aidez' (auta minua).",
     "Antenni on radion herkin osa. Älä roikota radiota siitä!",
     "Poliisit käyttävät aakkosia: A=Aarne, B=Bertta...",
     "Radioaallot kulkevat valon nopeudella (300 000 km/s).",
@@ -378,12 +377,12 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
     requiredRankId: 'R3',
     variants: [
       {
-        id: 'mayday_1',
-        scenario: 'Kaverisi putosi kalliolta ja ei liiku. Tarvitset ambulanssin.',
+        id: 'emergency_1',
+        scenario: 'Kaverisi kaatui pahasti ja ei pysty kävelemään. Tarvitset apua heti.',
         type: QuestionType.MULTIPLE_CHOICE,
         options: [
-          { id: 'a', text: 'Tukikohta, täällä {CALLSIGN}, apua.', isCorrect: false, feedback: 'Liian lievä.' },
-          { id: 'b', text: 'MAYDAY, MAYDAY, MAYDAY. Täällä {CALLSIGN}. Putoaminen, tajuton.', isCorrect: true, feedback: 'Oikein. Selkeä hätäkutsu.' },
+          { id: 'a', text: 'Tukikohta, tulkaa tänne.', isCorrect: false, feedback: 'Liian epäselvä. Kerro että on hätä.' },
+          { id: 'b', text: 'TUKIKOHTA, TÄÄLLÄ {CALLSIGN}. HÄTÄ. Kaveri loukkaantui.', isCorrect: true, feedback: 'Oikein. Selkeä ilmoitus.' },
         ],
       },
       {
