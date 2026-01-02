@@ -17,13 +17,13 @@ const App: React.FC = () => {
 
   const handleUserSelect = (user: string) => {
     setCurrentUser(user);
-    // Case-insensitive check for admin
-    if (user.toLowerCase() === 'crimescene') {
-        setGameState('ADMIN_DASHBOARD');
-    } else {
-        setGameState('START');
-    }
+    setGameState('START');
   };
+
+  const handleAdminLogin = () => {
+    setCurrentUser('ADMIN');
+    setGameState('ADMIN_DASHBOARD');
+  }
 
   const handleStart = (selectedCallsign: Callsign) => {
     setCallsign(selectedCallsign);
@@ -70,7 +70,10 @@ const App: React.FC = () => {
     <div className="bg-slate-900 min-h-screen text-slate-200 selection:bg-emerald-500 selection:text-slate-900 relative">
       
       {gameState === 'USER_SELECT' && (
-        <UserSelectScreen onUserSelect={handleUserSelect} />
+        <UserSelectScreen 
+            onUserSelect={handleUserSelect} 
+            onAdminLogin={handleAdminLogin}
+        />
       )}
 
       {gameState === 'ADMIN_DASHBOARD' && (

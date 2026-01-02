@@ -89,10 +89,10 @@ const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
     <div className="min-h-screen bg-slate-950 text-slate-200 p-6 md:p-10 font-mono">
       {/* Header */}
       <div className="flex justify-between items-center mb-10 border-b border-slate-800 pb-4">
-        <div className="flex items-center gap-3 text-rose-500">
+        <div className="flex items-center gap-3 text-emerald-500">
             <AlertTriangle size={24} />
             <h1 className="text-2xl font-bold uppercase tracking-widest">
-                Admin Terminal // CRIMESCENE
+                Admin Terminal // ACCESS GRANTED
             </h1>
         </div>
         <button 
