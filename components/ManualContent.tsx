@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radio, Mic, ShieldAlert, Siren, CheckCircle2, Wifi, ScanLine, Map, Lock, RefreshCw, AlertTriangle, Play, Battery } from 'lucide-react';
-import { MANUAL_PAGES, RADIO_FACTS, RANKS } from '../constants';
+import { MANUAL_PAGES, RADIO_FACTS } from '../constants';
 import { ManualPage } from '../types';
 
 interface ManualContentProps {
@@ -11,7 +11,7 @@ interface ManualContentProps {
   triggerPrev: boolean;
   onConsumedTrigger: () => void;
   onComplete: () => void;
-  passedGamesCount: number;
+  targetRankId: string; // CHANGED: Explicit rank ID
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -36,7 +36,7 @@ const ManualContent: React.FC<ManualContentProps> = ({
   triggerPrev, 
   onConsumedTrigger,
   onComplete,
-  passedGamesCount
+  targetRankId
 }) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [randomFact, setRandomFact] = useState<string>('');
@@ -45,25 +45,17 @@ const ManualContent: React.FC<ManualContentProps> = ({
   useEffect(() => {
     setRandomFact(RADIO_FACTS[Math.floor(Math.random() * RADIO_FACTS.length)]);
     
-    // Determine Pages based on Rank
-    // 0 passed -> R0 content
-    // 1 passed -> R1 content
-    const rankIndex = Math.min(passedGamesCount, RANKS.length - 1);
-    const currentRank = RANKS[rankIndex];
+    // Filter pages based on the specific Target Rank ID provided by parent
+    let relevantPages = MANUAL_PAGES.filter(p => p.requiredRankId === targetRankId);
     
-    let relevantPages = MANUAL_PAGES.filter(p => p.requiredRankId === currentRank.id);
-    
-    // Fallback logic
+    // Fallback if no pages found (shouldn't happen with correct config)
     if (relevantPages.length === 0) {
-        // If we are super high rank, show the hardest stuff (Max Level)
-        const highestRankId = RANKS[RANKS.length - 1].id;
-        relevantPages = MANUAL_PAGES.filter(p => p.requiredRankId === highestRankId);
-        if(relevantPages.length === 0) relevantPages = MANUAL_PAGES; // Absolute fallback
+        relevantPages = MANUAL_PAGES; 
     }
 
     setPages(relevantPages);
     setPageIndex(0); // Reset to start of new manual
-  }, [passedGamesCount]);
+  }, [targetRankId]);
 
   // Safeguard if pages are loading or empty
   const currentPage = pages[pageIndex] || MANUAL_PAGES[0]; 

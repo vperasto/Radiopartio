@@ -1,5 +1,5 @@
 
-export type GameState = 'USER_SELECT' | 'START' | 'MANUAL' | 'PLAYING' | 'FINISHED' | 'ADMIN_DASHBOARD';
+export type GameState = 'USER_SELECT' | 'START' | 'MISSION_SELECT' | 'MANUAL' | 'PLAYING' | 'FINISHED' | 'ADMIN_DASHBOARD';
 
 export type Callsign = 'Haukka' | 'Karhu' | 'Susi' | 'Ilves' | 'Salama' | 'Myrsky' | 'Kallio' | 'Varjo' | 'Kaiku' | 'Halla';
 

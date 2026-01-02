@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, AlertCircle, RefreshCcw } from 'lucide-react';
 import { QuestionVariant, QuestionType, Option, Callsign } from '../types';
-import { RANKS } from '../constants';
 import { StorageUtils } from '../utils/storage';
 import PTTButton from './PTTButton';
 
@@ -13,7 +12,7 @@ interface GameContentProps {
   triggerNext: boolean; 
   onConsumedTrigger: () => void;
   onGameComplete: (score: number, totalQuestions: number) => void;
-  passedGamesCount: number;
+  targetRankId: string; // CHANGED: Explicit rank ID
 }
 
 const GameContent: React.FC<GameContentProps> = ({ 
@@ -22,7 +21,7 @@ const GameContent: React.FC<GameContentProps> = ({
   triggerNext,
   onConsumedTrigger,
   onGameComplete,
-  passedGamesCount
+  targetRankId
 }) => {
   const [questions, setQuestions] = useState<QuestionVariant[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,20 +35,16 @@ const GameContent: React.FC<GameContentProps> = ({
     // 1. Get all questions
     const allCategories = StorageUtils.getQuestionBank();
 
-    // 2. Determine Current Rank based on passed games
-    const rankIndex = Math.min(passedGamesCount, RANKS.length - 1);
-    const currentRank = RANKS[rankIndex];
+    // 2. Filter Questions based on specific target Rank ID
+    let relevantCategories = allCategories.filter(cat => cat.requiredRankId === targetRankId);
 
-    // 3. Filter Questions based on Rank ID
-    let relevantCategories = allCategories.filter(cat => cat.requiredRankId === currentRank.id);
-
-    // Fallback logic
+    // Fallback if no questions found for this rank (shouldn't happen)
     if (relevantCategories.length === 0) {
-        const highestRankId = RANKS[RANKS.length - 1].id;
-        relevantCategories = allCategories.filter(cat => cat.requiredRankId === highestRankId);
+        // Fallback to searching for R0
+        relevantCategories = allCategories.filter(cat => cat.requiredRankId === 'R0');
     }
 
-    // 4. Flatten and Shuffle
+    // 3. Flatten and Shuffle
     const sessionQuestions = relevantCategories.map(cat => {
       const randomIndex = Math.floor(Math.random() * cat.variants.length);
       return { 
@@ -62,7 +57,7 @@ const GameContent: React.FC<GameContentProps> = ({
     sessionQuestions.sort(() => Math.random() - 0.5);
 
     setQuestions(sessionQuestions);
-  }, [passedGamesCount]);
+  }, [targetRankId]);
 
   useEffect(() => {
     if (triggerNext && feedback) {

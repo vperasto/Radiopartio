@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { GameState, Callsign } from './types';
+import { GameState, Callsign, Rank } from './types';
 import { StorageUtils } from './utils/storage';
 import UserSelectScreen from './components/UserSelectScreen';
 import StartScreen from './components/StartScreen';
 import ResultScreen from './components/ResultScreen';
 import TrainingSession from './components/TrainingSession';
 import AdminPanel from './components/AdminPanel';
+import MissionSelectScreen from './components/MissionSelectScreen';
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('USER_SELECT');
@@ -14,11 +15,15 @@ const App: React.FC = () => {
   const [callsign, setCallsign] = useState<Callsign | null>(null);
   const [finalScore, setFinalScore] = useState(0);
   const [totalQuestionsPlayed, setTotalQuestionsPlayed] = useState(0);
+  
+  // Specific rank override for Mission Select (review mode)
+  const [selectedRankId, setSelectedRankId] = useState<string | undefined>(undefined);
 
   // Get user history for rank calculations
   const userHistory = currentUser ? StorageUtils.getUserHistory(currentUser) : [];
   const passedCount = userHistory.filter(h => h.passed).length;
   const hasCompletedBefore = passedCount > 0;
+  const isMasterOperator = passedCount >= 4; // Completed all 4 levels
 
   const handleUserSelect = (user: string) => {
     setCurrentUser(user);
@@ -32,8 +37,25 @@ const App: React.FC = () => {
 
   const handleStart = (selectedCallsign: Callsign) => {
     setCallsign(selectedCallsign);
-    // Instead of separating Manual/Playing, we use a single session state
-    setGameState('MANUAL'); 
+    
+    if (isMasterOperator) {
+        // If user has completed everything, let them choose
+        setGameState('MISSION_SELECT');
+    } else {
+        // Otherwise, continue linear progression
+        setSelectedRankId(undefined); // Clear any previous selection
+        setGameState('MANUAL'); 
+    }
+  };
+
+  const handleSelectRank = (rank: Rank) => {
+      setSelectedRankId(rank.id);
+      setGameState('MANUAL');
+  };
+
+  const handleBackToStart = () => {
+      setGameState('START');
+      setCallsign(null);
   };
 
   const handleGameComplete = (score: number, totalQuestions: number) => {
@@ -61,6 +83,7 @@ const App: React.FC = () => {
     setCallsign(null);
     setFinalScore(0);
     setTotalQuestionsPlayed(0);
+    setSelectedRankId(undefined);
   };
 
   const handleLogout = () => {
@@ -69,6 +92,7 @@ const App: React.FC = () => {
     setCallsign(null);
     setFinalScore(0);
     setTotalQuestionsPlayed(0);
+    setSelectedRankId(undefined);
   };
 
   return (
@@ -89,6 +113,14 @@ const App: React.FC = () => {
         <StartScreen onSelectCallsign={handleStart} />
       )}
 
+      {gameState === 'MISSION_SELECT' && (
+          <MissionSelectScreen 
+              passedGamesCount={passedCount}
+              onSelectRank={handleSelectRank}
+              onBack={handleBackToStart}
+          />
+      )}
+
       {/* Unified Training Session Component */}
       {(gameState === 'MANUAL' || gameState === 'PLAYING') && callsign && currentUser && (
         <TrainingSession 
@@ -98,6 +130,7 @@ const App: React.FC = () => {
             hasCompletedBefore={hasCompletedBefore}
             onGameComplete={handleGameComplete}
             onExit={handleRestart}
+            targetRankId={selectedRankId} // Pass the specific rank if selected
         />
       )}
 

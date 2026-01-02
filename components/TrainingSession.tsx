@@ -15,6 +15,7 @@ interface TrainingSessionProps {
   hasCompletedBefore: boolean;
   onGameComplete: (score: number, totalQuestions: number) => void;
   onExit: () => void;
+  targetRankId?: string; // Optional: Force a specific level
 }
 
 type Phase = 'MANUAL' | 'GAME';
@@ -25,7 +26,8 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
   passedGamesCount,
   hasCompletedBefore,
   onGameComplete,
-  onExit
+  onExit,
+  targetRankId
 }) => {
   const [phase, setPhase] = useState<Phase>('MANUAL');
   
@@ -42,7 +44,12 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
   const [triggerNext, setTriggerNext] = useState(false);
   const [triggerPrev, setTriggerPrev] = useState(false);
 
-  const currentRank = [...RANKS].reverse().find(r => passedGamesCount >= r.minPassed) || RANKS[0];
+  // DETERMINE ACTIVE RANK
+  // If targetRankId is passed (Mission Select), use it.
+  // Otherwise, use progression logic (passedGamesCount).
+  const currentRank = targetRankId 
+    ? RANKS.find(r => r.id === targetRankId) || RANKS[0]
+    : [...RANKS].reverse().find(r => passedGamesCount >= r.minPassed) || RANKS[0];
 
   const handleStatusUpdate = useCallback((newStatus: any) => {
     setStatus(newStatus);
@@ -149,7 +156,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                             triggerPrev={triggerPrev}
                             onConsumedTrigger={handleConsumedTrigger}
                             onComplete={handleManualComplete}
-                            passedGamesCount={passedGamesCount} // NEW PROP
+                            targetRankId={currentRank.id} // Pass explicit rank ID
                          />
                       </motion.div>
                   ) : (
@@ -166,7 +173,8 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                             triggerNext={triggerNext}
                             onConsumedTrigger={handleConsumedTrigger}
                             onGameComplete={onGameComplete}
-                            passedGamesCount={passedGamesCount} // NEW PROP
+                            passedGamesCount={passedGamesCount} // Used for some UI logic if needed, but primary is targetRankId
+                            targetRankId={currentRank.id} // Pass explicit rank ID
                          />
                       </motion.div>
                   )}
@@ -198,7 +206,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
         </button>
 
         {/* FAST TRACK (Skip Manual) */}
-        {phase === 'MANUAL' && hasCompletedBefore && !status.isComplete && (
+        {phase === 'MANUAL' && (hasCompletedBefore || targetRankId) && !status.isComplete && (
              <button
                 onClick={() => setPhase('GAME')}
                 className="
