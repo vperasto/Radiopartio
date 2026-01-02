@@ -9,6 +9,7 @@ interface UserStat {
   passedGames: number;
   avgScore: number;
   lastPlayed: number;
+  favoriteCallsign: string;
 }
 
 const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
@@ -38,6 +39,7 @@ const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         
         let avgScore = 0;
         let lastPlayed = 0;
+        let favoriteCallsign = '-';
 
         if (totalGames > 0) {
             const totalScore = userGames.reduce((acc, curr) => acc + curr.score, 0);
@@ -45,6 +47,22 @@ const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             
             // Find most recent timestamp
             lastPlayed = Math.max(...userGames.map(g => g.timestamp));
+
+            // Calculate favorite callsign (Mode)
+            const callsignCounts: Record<string, number> = {};
+            userGames.forEach(g => {
+                if (g.callsign) {
+                    callsignCounts[g.callsign] = (callsignCounts[g.callsign] || 0) + 1;
+                }
+            });
+
+            let maxCount = 0;
+            Object.entries(callsignCounts).forEach(([sign, count]) => {
+                if (count > maxCount) {
+                    maxCount = count;
+                    favoriteCallsign = sign;
+                }
+            });
         }
 
         return {
@@ -52,7 +70,8 @@ const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
             totalGames,
             passedGames,
             avgScore,
-            lastPlayed
+            lastPlayed,
+            favoriteCallsign
         };
     });
 
@@ -147,6 +166,10 @@ const AdminPanel: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
                               <span className="text-slate-200">{stat.passedGames}</span>
                           </div>
                           <div className="flex justify-between">
+                              <span>Top Callsign:</span>
+                              <span className="text-emerald-400 font-bold">{stat.favoriteCallsign}</span>
+                          </div>
+                          <div className="flex justify-between pt-2 border-t border-slate-800">
                               <span>Last Active:</span>
                               <span className="text-xs mt-1">{formatDate(stat.lastPlayed)}</span>
                           </div>
