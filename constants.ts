@@ -112,7 +112,7 @@ export const MANUAL_PAGES: ManualPage[] = [
     title: "1. SIJAINTITURVA",
     icon: "Map",
     requiredRankId: "R2",
-    content: "Älä koskaan kerro tarkkaa osoitetta radiossa.\n\nKäytä kiintopisteitä:\n'Olen Ison Kiven luona.'\n'Saavuin Kotipesään.'\n\nVihollinen voi kuunnella. Älä paljasta leirin sijaintia."
+    content: "Älä koskaan kerro tarkkaa osoitetta radiossa.\n\nKäytä kiintopisteitä:\n'Olen Ison Kiven luona.'\n'Saavuin Kotipesään.'\n\nUlkopuoliset voivat kuunnella. Älä paljasta leirin sijaintia."
   },
   {
     id: 10,
@@ -339,7 +339,7 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
         scenario: 'Tukikohta kysyy sijaintiasi. Olet K-Marketin edessä.',
         type: QuestionType.MULTIPLE_CHOICE,
         options: [
-          { id: 'a', text: 'Olen K-Marketin edessä.', isCorrect: false, feedback: 'Liian tarkka! Vihollinen tietää missä olet.' },
+          { id: 'a', text: 'Olen K-Marketin edessä.', isCorrect: false, feedback: 'Liian tarkka! Ulkopuoliset tietävät missä olet.' },
           { id: 'b', text: 'Sijainti: Muonapiste Alpha.', isCorrect: true, feedback: 'Oikein. Käytit koodinimeä.' },
         ],
       },

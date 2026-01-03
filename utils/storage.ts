@@ -27,6 +27,11 @@ export const StorageUtils = {
     }
   },
 
+  // Added ability to overwrite users list (for admin)
+  saveUsers: (users: string[]) => {
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+  },
+
   // --- SESSION PERSISTENCE ---
   getLastUser: (): string | null => {
       return localStorage.getItem(KEYS.LAST_USER);
