@@ -44,7 +44,8 @@ export interface ManualPage {
   title: string;
   icon: string;
   content: string;
-  requiredRankId?: string; // NEW: Leveled manual content
+  requiredRankId?: string; 
+  layout?: 'TEXT' | 'ALPHABET_GRID'; // New: Support for custom layouts
 }
 
 export interface GameHistory {
@@ -59,7 +60,7 @@ export interface GameHistory {
 
 export interface UserProfile {
   name: string;
-  avatarId?: string; // New: ID for the selected icon
+  avatarId?: string; // ID for the selected icon
 }
 
 export interface Rank {

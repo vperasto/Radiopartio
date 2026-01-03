@@ -9,10 +9,6 @@ export const CALLSIGNS: Callsign[] = [
 ];
 
 // Progression Logic:
-// 0 wins = Rank 0 (Kokelas) -> Plays R0 content.
-// 1 win  = Rank 1 (Viestittäjä) -> Plays R1 content.
-// 2 wins = Rank 2 (Tarkkailija) -> Plays R2 content.
-// 3 wins = Rank 3 (Operaattori) -> Plays R3 content.
 export const RANKS: Rank[] = [
     { id: 'R0', title: 'KOKELAS', minPassed: 0, icon: 'User' },
     { id: 'R1', title: 'VIESTITTÄJÄ', minPassed: 1, icon: 'Radio' },
@@ -35,14 +31,27 @@ export const AVATAR_OPTIONS = [
     { id: 'bug', icon: Bug },
 ];
 
+export const PHONETIC_ALPHABET = [
+  { l: 'A', w: 'Aarne' }, { l: 'B', w: 'Bertta' }, { l: 'C', w: 'Celsius' },
+  { l: 'D', w: 'Daavid' }, { l: 'E', w: 'Eemeli' }, { l: 'F', w: 'Faarao' },
+  { l: 'G', w: 'Gideon' }, { l: 'H', w: 'Heikki' }, { l: 'I', w: 'Iivari' },
+  { l: 'J', w: 'Jussi' }, { l: 'K', w: 'Kalle' }, { l: 'L', w: 'Lauri' },
+  { l: 'M', w: 'Matti' }, { l: 'N', w: 'Niilo' }, { l: 'O', w: 'Otto' },
+  { l: 'P', w: 'Paavo' }, { l: 'Q', w: 'Kuu' }, { l: 'R', w: 'Risto' },
+  { l: 'S', w: 'Sakari' }, { l: 'T', w: 'Tyyne' }, { l: 'U', w: 'Urho' },
+  { l: 'V', w: 'Vihtori' }, { l: 'W', w: 'Wiski' }, { l: 'X', w: 'Äksä' },
+  { l: 'Y', w: 'Yrjö' }, { l: 'Z', w: 'Tseta' }, { l: 'Å', w: 'Åke' },
+  { l: 'Ä', w: 'Äiti' }, { l: 'Ö', w: 'Öljy' }
+];
+
 export const MANUAL_PAGES: ManualPage[] = [
-  // --- RANK 0 (PERUSTEET) - EXISTING CONTENT ---
+  // --- RANK 0 (PERUSTEET) ---
   {
     id: 1,
     title: "1. KUTSUKAAVA",
     icon: "Radio",
     requiredRankId: "R0",
-    content: "Radiossa ei huudeta 'haloo'.\nKäytä aina tätä kaavaa:\n\n1. KENELLE (Vastaanottaja)\n2. KENELTÄ (Sinä)\n\nEsimerkki: 'Tukikohta, täällä Haukka.'"
+    content: "Radiossa ei huudeta 'haloo' tai 'Äiti vastaaaaa!'.\nKäytä aina tätä kaavaa:\n\n1. KENELLE (Vastaanottaja)\n2. KENELTÄ (Sinä)\n\nEsimerkki: 'Tukikohta, täällä Haukka.' (käytä aina radionimiä, ei oikeita)"
   },
   {
     id: 2,
@@ -73,13 +82,14 @@ export const MANUAL_PAGES: ManualPage[] = [
     content: "Nämä ovat kaksi eri asiaa:\n\nKUITTI = 'Ymmärsin viestisi.'\nLOPPU = 'Lopetin puhumisen, sinun vuorosi.'\n\nSano 'LOPPU', jotta kaveri tietää milloin saa painaa nappia!"
   },
 
-  // --- RANK 1 (VIESTITTÄJÄ) - NEW CONTENT: Clarity & Connection ---
+  // --- RANK 1 (VIESTITTÄJÄ) ---
   {
     id: 6,
     title: "1. TAVUTUSAAKKOSET",
     icon: "ScanLine",
     requiredRankId: "R1",
-    content: "Jos yhteys on huono, sanat pitää tavata.\n\nA = Alfa\nB = Bertta\nC = Celsius\nD = Daavid\nE = Eemeli\nF = Faarao\nG = Gideon\nH = Heikki\n\nOpettele ainakin oma nimesi näillä!"
+    content: "Jos yhteys on huono, sanat pitää tavata.\nOpettele ainakin oma nimesi näillä!",
+    layout: 'ALPHABET_GRID'
   },
   {
     id: 7,
@@ -96,7 +106,7 @@ export const MANUAL_PAGES: ManualPage[] = [
     content: "Jos rätisee:\n1. Nosta radio pystyyn (antenni kohti taivasta).\n2. Kiipeä korkeammalle.\n3. Mene pois metalliaitojen vierestä.\n\nÄlä huuda. Puhu rauhallisesti ja selkeästi mikrofoniin."
   },
 
-  // --- RANK 2 (TARKKAILIJA) - NEW CONTENT: Security & Observation ---
+  // --- RANK 2 (TARKKAILIJA) ---
   {
     id: 9,
     title: "1. SIJAINTITURVA",
@@ -119,7 +129,7 @@ export const MANUAL_PAGES: ManualPage[] = [
     content: "Jos tuntematon kysyy: 'Oletko yksin?', älä vastaa totta.\n\nVastaa: 'Partio Alpha saapuu sijaintiini.'\n\nNäin kuulostat isommalta joukolta."
   },
 
-  // --- RANK 3 (OPERAATTORI) - NEW CONTENT: Emergency & Leadership ---
+  // --- RANK 3 (OPERAATTORI) ---
   {
     id: 12,
     title: "1. HÄTÄTILANNE",
@@ -158,7 +168,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
   // ==========================
   // RANK 0: KOKELAS (Perusteet)
   // ==========================
-  // Category 1: Protokolla
   {
     id: 'PROTOKOLLA_R0',
     title: 'PERUSPROTOKOLLA (R0)',
@@ -185,7 +194,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
       }
     ]
   },
-  // Category 2: Värikoodit
   {
     id: 'COLORS_R0',
     title: 'VÄRIKOODIT (R0)',
@@ -193,7 +201,7 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
     variants: [
       {
         id: 'color_basic',
-        scenario: 'Näet vieraan ihmisen leirin lähellä. Hän ei näe sinua.',
+        scenario: 'Näet vieraan, hieman epäilyttävän näköisen, ihmisen leirin lähellä. Hän ei ole nähnyt sinua.',
         type: QuestionType.MULTIPLE_CHOICE,
         options: [
           { id: 'a', text: 'Koodi Vihreä', isCorrect: false, feedback: 'Ei. Tämä vaatii huomiota.' },
@@ -203,7 +211,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
       }
     ]
   },
-  // Category 3: Salaisuudet (NEW) - Covers Manual Page 3
   {
     id: 'SECRETS_R0',
     title: 'SALAISUUDET (R0)',
@@ -229,7 +236,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
       }
     ]
   },
-  // Category 4: Kuitti & Loppu (NEW) - Covers Manual Page 5
   {
     id: 'TERMINOLOGY_R0',
     title: 'KUITTI JA LOPPU (R0)',
@@ -259,7 +265,7 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
   },
 
   // ==========================
-  // RANK 1: VIESTITTÄJÄ (Aakkoset & Kuuluvuus)
+  // RANK 1: VIESTITTÄJÄ
   // ==========================
   {
     id: 'AAKKOSET_R1',
@@ -273,12 +279,11 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
         options: [
           { id: 'a', text: 'Aarne - Paavo - Urho', isCorrect: false, feedback: 'Nuo ovat vanhoja nimiä. Käytämme uusia.' },
           { id: 'b', text: 'Alfa - Paavo - Urho', isCorrect: false, feedback: 'Sekoitus.' },
-          { id: 'c', text: 'Alfa - Papa - Uniform (tai Alfa-Pekka-Urho)', isCorrect: true, feedback: 'Oikein. Tavutit selkeästi.' },
+          { id: 'c', text: 'Aarne - Paavo - Urho (tai Alfa-Papa-Uniform)', isCorrect: true, feedback: 'Oikein. Tavutit selkeästi.' },
         ],
       },
     ]
   },
-  // Added REPEAT category for R1
   {
     id: 'REPEAT_R1',
     title: 'TOISTAMINEN (R1)',
@@ -322,7 +327,7 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
   },
 
   // ==========================
-  // RANK 2: TARKKAILIJA (Turvallisuus)
+  // RANK 2: TARKKAILIJA
   // ==========================
   {
     id: 'SECURITY_R2',
@@ -350,7 +355,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
       }
     ]
   },
-  // Added DECEPTION category for R2
   {
     id: 'DECEPTION_R2',
     title: 'HARHAUTUS (R2)',
@@ -369,7 +373,7 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
   },
 
   // ==========================
-  // RANK 3: OPERAATTORI (Hätä & Johto)
+  // RANK 3: OPERAATTORI
   // ==========================
   {
     id: 'EMERGENCY_R3',
@@ -396,7 +400,6 @@ export const INITIAL_QUESTION_BANK: QuestionCategory[] = [
       }
     ]
   },
-  // Added MAINTENANCE category for R3
   {
     id: 'MAINTENANCE_R3',
     title: 'KALUSTO (R3)',

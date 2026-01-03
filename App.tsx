@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState, Callsign, Rank } from './types';
 import { StorageUtils } from './utils/storage';
 import UserSelectScreen from './components/UserSelectScreen';
@@ -19,6 +19,31 @@ const App: React.FC = () => {
   // Specific rank override for Mission Select (review mode)
   const [selectedRankId, setSelectedRankId] = useState<string | undefined>(undefined);
 
+  // Initialize: Check for persisted session (User AND Callsign)
+  useEffect(() => {
+    const lastUser = StorageUtils.getLastUser();
+    const lastCallsign = StorageUtils.getLastCallsign();
+    
+    if (lastUser) {
+        setCurrentUser(lastUser);
+        if (lastCallsign) {
+             setCallsign(lastCallsign as Callsign);
+             
+             // Check rank to decide start screen
+             const history = StorageUtils.getUserHistory(lastUser);
+             const passed = history.filter(h => h.passed).length;
+             
+             if (passed >= 4) {
+                 setGameState('MISSION_SELECT');
+             } else {
+                 setGameState('MANUAL');
+             }
+        } else {
+            setGameState('START'); // User known, but needs to pick callsign
+        }
+    }
+  }, []);
+
   // Get user history for rank calculations
   const userHistory = currentUser ? StorageUtils.getUserHistory(currentUser) : [];
   const passedCount = userHistory.filter(h => h.passed).length;
@@ -27,6 +52,7 @@ const App: React.FC = () => {
 
   const handleUserSelect = (user: string) => {
     setCurrentUser(user);
+    StorageUtils.setLastUser(user);
     setGameState('START');
   };
 
@@ -37,13 +63,12 @@ const App: React.FC = () => {
 
   const handleStart = (selectedCallsign: Callsign) => {
     setCallsign(selectedCallsign);
-    
+    StorageUtils.setLastCallsign(selectedCallsign); // Persist CallSign
+
     if (isMasterOperator) {
-        // If user has completed everything, let them choose
         setGameState('MISSION_SELECT');
     } else {
-        // Otherwise, continue linear progression
-        setSelectedRankId(undefined); // Clear any previous selection
+        setSelectedRankId(undefined); 
         setGameState('MANUAL'); 
     }
   };
@@ -53,16 +78,10 @@ const App: React.FC = () => {
       setGameState('MANUAL');
   };
 
-  const handleBackToStart = () => {
-      setGameState('START');
-      setCallsign(null);
-  };
-
   const handleGameComplete = (score: number, totalQuestions: number) => {
     setFinalScore(score);
     setTotalQuestionsPlayed(totalQuestions);
     
-    // Save Result
     if (currentUser && callsign) {
         StorageUtils.saveGameResult({
             id: Date.now().toString(),
@@ -70,7 +89,7 @@ const App: React.FC = () => {
             user: currentUser,
             callsign: callsign,
             score: score,
-            total: totalQuestions, // Save the actual number of questions played in this specific session
+            total: totalQuestions,
             passed: score / totalQuestions >= 0.7
         });
     }
@@ -78,16 +97,35 @@ const App: React.FC = () => {
     setGameState('FINISHED');
   };
 
+  // Called when finishing a level or clicking "Back" in result
   const handleRestart = () => {
-    setGameState('START');
-    setCallsign(null);
+    // If master operator, go to mission select. Otherwise, if mid-progression, start manual.
+    // However, usually we want to see the menu if available.
+    if (isMasterOperator) {
+        setGameState('MISSION_SELECT');
+    } else {
+        // Linear progression continue
+        setGameState('MANUAL'); 
+    }
     setFinalScore(0);
     setTotalQuestionsPlayed(0);
     setSelectedRankId(undefined);
   };
 
+  // Change only the Callsign (Keep User)
+  const handleChangeCallsign = () => {
+      setGameState('START');
+      StorageUtils.clearCallsign();
+      setCallsign(null);
+      setFinalScore(0);
+      setTotalQuestionsPlayed(0);
+      setSelectedRankId(undefined);
+  }
+
+  // Full Logout (Clear User & Callsign)
   const handleLogout = () => {
     setGameState('USER_SELECT');
+    StorageUtils.clearSession();
     setCurrentUser(null);
     setCallsign(null);
     setFinalScore(0);
@@ -113,11 +151,14 @@ const App: React.FC = () => {
         <StartScreen onSelectCallsign={handleStart} />
       )}
 
-      {gameState === 'MISSION_SELECT' && (
+      {gameState === 'MISSION_SELECT' && currentUser && callsign && (
           <MissionSelectScreen 
+              currentUser={currentUser}
+              callsign={callsign}
               passedGamesCount={passedCount}
               onSelectRank={handleSelectRank}
-              onBack={handleBackToStart}
+              onLogout={handleLogout}
+              onChangeCallsign={handleChangeCallsign}
           />
       )}
 
@@ -130,14 +171,15 @@ const App: React.FC = () => {
             hasCompletedBefore={hasCompletedBefore}
             onGameComplete={handleGameComplete}
             onExit={handleRestart}
-            targetRankId={selectedRankId} // Pass the specific rank if selected
+            onLogout={handleLogout} // Passed here
+            targetRankId={selectedRankId} 
         />
       )}
 
       {gameState === 'FINISHED' && callsign && (
         <ResultScreen 
           score={finalScore} 
-          total={totalQuestionsPlayed} // Pass the dynamic total
+          total={totalQuestionsPlayed} 
           callsign={callsign} 
           onRestart={handleRestart} 
           onLogout={handleLogout}

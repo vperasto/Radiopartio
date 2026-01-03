@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radio, Mic, ShieldAlert, Siren, CheckCircle2, Wifi, ScanLine, Map, Lock, RefreshCw, AlertTriangle, Play, Battery } from 'lucide-react';
-import { MANUAL_PAGES, RADIO_FACTS } from '../constants';
+import { MANUAL_PAGES, RADIO_FACTS, PHONETIC_ALPHABET } from '../constants';
 import { ManualPage } from '../types';
 
 interface ManualContentProps {
@@ -11,7 +11,7 @@ interface ManualContentProps {
   triggerPrev: boolean;
   onConsumedTrigger: () => void;
   onComplete: () => void;
-  targetRankId: string; // CHANGED: Explicit rank ID
+  targetRankId: string;
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -48,7 +48,7 @@ const ManualContent: React.FC<ManualContentProps> = ({
     // Filter pages based on the specific Target Rank ID provided by parent
     let relevantPages = MANUAL_PAGES.filter(p => p.requiredRankId === targetRankId);
     
-    // Fallback if no pages found (shouldn't happen with correct config)
+    // Fallback if no pages found
     if (relevantPages.length === 0) {
         relevantPages = MANUAL_PAGES; 
     }
@@ -129,10 +129,27 @@ const ManualContent: React.FC<ManualContentProps> = ({
 
                     {/* Manual Text Content */}
                     <div className="flex-1 flex flex-col justify-center p-4 md:p-12 z-10 overflow-hidden relative">
-                        <div className="overflow-y-auto max-h-full scrollbar-hide">
-                            <p className="font-mono text-base md:text-2xl text-slate-200 leading-relaxed whitespace-pre-line drop-shadow-md max-w-4xl mx-auto">
-                                {currentPage.content}
-                            </p>
+                        <div className="overflow-y-auto max-h-full scrollbar-hide w-full">
+                           {currentPage.layout === 'ALPHABET_GRID' ? (
+                               <div className="max-w-5xl mx-auto w-full flex flex-col h-full">
+                                   <p className="font-mono text-base md:text-xl text-slate-300 mb-6 text-center whitespace-pre-line shrink-0">
+                                       {currentPage.content}
+                                   </p>
+                                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2 overflow-y-auto min-h-0">
+                                       {PHONETIC_ALPHABET.map((item) => (
+                                           <div key={item.l} className="flex items-center gap-2 font-mono text-sm md:text-lg">
+                                               <span className="text-emerald-500 font-bold w-6 text-right shrink-0">{item.l}</span>
+                                               <span className="text-slate-500">=</span>
+                                               <span className="text-slate-200 truncate">{item.w}</span>
+                                           </div>
+                                       ))}
+                                   </div>
+                               </div>
+                           ) : (
+                               <p className="font-mono text-base md:text-2xl text-slate-200 leading-relaxed whitespace-pre-line drop-shadow-md max-w-4xl mx-auto">
+                                   {currentPage.content}
+                               </p>
+                           )}
                         </div>
                     </div>
 

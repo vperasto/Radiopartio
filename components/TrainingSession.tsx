@@ -1,7 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Battery, ArrowLeft, ArrowRight, SkipForward } from 'lucide-react';
+import { BookOpen, BatteryMedium, ArrowLeft, ArrowRight, SkipForward, LogOut } from 'lucide-react';
 import { Callsign } from '../types';
 import { RANKS } from '../constants';
 import IdentityCard from './IdentityCard';
@@ -15,7 +15,8 @@ interface TrainingSessionProps {
   hasCompletedBefore: boolean;
   onGameComplete: (score: number, totalQuestions: number) => void;
   onExit: () => void;
-  targetRankId?: string; // Optional: Force a specific level
+  onLogout: () => void; // Added onLogout
+  targetRankId?: string; 
 }
 
 type Phase = 'MANUAL' | 'GAME';
@@ -27,6 +28,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
   hasCompletedBefore,
   onGameComplete,
   onExit,
+  onLogout,
   targetRankId
 }) => {
   const [phase, setPhase] = useState<Phase>('MANUAL');
@@ -45,8 +47,6 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
   const [triggerPrev, setTriggerPrev] = useState(false);
 
   // DETERMINE ACTIVE RANK
-  // If targetRankId is passed (Mission Select), use it.
-  // Otherwise, use progression logic (passedGamesCount).
   const currentRank = targetRankId 
     ? RANKS.find(r => r.id === targetRankId) || RANKS[0]
     : [...RANKS].reverse().find(r => passedGamesCount >= r.minPassed) || RANKS[0];
@@ -63,7 +63,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
       if (status.canGoBack) {
         setTriggerPrev(true);
       } else if (phase === 'MANUAL') {
-          // If on first page of manual, exit
+          // If on first page of manual, exit to menu
           onExit();
       }
   };
@@ -103,7 +103,18 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                     {status.progress}
                 </span>
             </div>
-            <Battery size={16} className="text-emerald-500 hidden md:block" />
+            
+            <div className="h-6 w-px bg-slate-700 mx-1"></div>
+            
+            <button 
+                onClick={onLogout}
+                className="text-slate-500 hover:text-rose-500 transition-colors"
+                title="Kirjaudu ulos"
+            >
+                <LogOut size={16} />
+            </button>
+
+            <BatteryMedium size={20} className="text-emerald-500 hidden md:block" />
         </div>
       </div>
 
@@ -113,7 +124,6 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
             
             {/* 
                IDENTITY CARD (Persistent)
-               - Uses `layout` prop to animate grid position change.
                - Manual Mode: Col 3 (Right)
                - Game Mode: Col 1 (Left)
             */}
@@ -127,15 +137,11 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                     callsign={callsign}
                     passedGamesCount={passedGamesCount}
                     isReadOnly={phase === 'GAME'}
+                    onLogout={onLogout} // Pass Logout to ID card
                 />
             </motion.div>
 
-            {/* 
-               MAIN CONTENT AREA
-               - Slides content in/out based on phase.
-               - Manual Mode: Cols 1-2 (Left)
-               - Game Mode: Cols 2-3 (Right)
-            */}
+            {/* MAIN CONTENT AREA */}
             <motion.div 
                 layout
                 className={`col-span-1 lg:col-span-2 h-full min-h-0 relative ${phase === 'MANUAL' ? 'lg:col-start-1 lg:row-start-1' : 'lg:col-start-2 lg:row-start-1'}`}
@@ -156,7 +162,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                             triggerPrev={triggerPrev}
                             onConsumedTrigger={handleConsumedTrigger}
                             onComplete={handleManualComplete}
-                            targetRankId={currentRank.id} // Pass explicit rank ID
+                            targetRankId={currentRank.id}
                          />
                       </motion.div>
                   ) : (
@@ -165,7 +171,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                         className="h-full w-full"
                         initial={{ x: 100, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.2 }} // Delay slightly to let ID card move
+                        transition={{ duration: 0.5, delay: 0.2 }}
                       >
                          <GameContent 
                             callsign={callsign}
@@ -173,8 +179,8 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
                             triggerNext={triggerNext}
                             onConsumedTrigger={handleConsumedTrigger}
                             onGameComplete={onGameComplete}
-                            passedGamesCount={passedGamesCount} // Used for some UI logic if needed, but primary is targetRankId
-                            targetRankId={currentRank.id} // Pass explicit rank ID
+                            passedGamesCount={passedGamesCount}
+                            targetRankId={currentRank.id}
                          />
                       </motion.div>
                   )}
@@ -190,7 +196,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({
         {/* PREVIOUS BUTTON */}
         <button
             onClick={handlePrevClick}
-            disabled={!status.canGoBack && phase === 'GAME'} // Can always go back in Manual (to exit), but not Game
+            disabled={!status.canGoBack && phase === 'GAME'}
             className={`
                 h-12 md:h-14 w-12 md:w-auto px-0 md:px-6 flex items-center justify-center gap-2
                 font-mono font-bold uppercase tracking-widest text-sm md:text-base transition-all duration-200

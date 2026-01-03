@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Edit2 } from 'lucide-react';
-import { Callsign, Rank } from '../types';
+import { User, Edit2, LogOut, RefreshCw } from 'lucide-react';
+import { Callsign } from '../types';
 import { RANKS, AVATAR_OPTIONS } from '../constants';
 import { StorageUtils } from '../utils/storage';
 
@@ -10,10 +11,20 @@ interface IdentityCardProps {
   callsign: Callsign;
   passedGamesCount: number;
   className?: string;
-  isReadOnly?: boolean; // If true, can't edit avatar (e.g., during game)
+  isReadOnly?: boolean; 
+  onLogout?: () => void;
+  onChangeCallsign?: () => void;
 }
 
-const IdentityCard: React.FC<IdentityCardProps> = ({ currentUser, callsign, passedGamesCount, className = "", isReadOnly = false }) => {
+const IdentityCard: React.FC<IdentityCardProps> = ({ 
+    currentUser, 
+    callsign, 
+    passedGamesCount, 
+    className = "", 
+    isReadOnly = false,
+    onLogout,
+    onChangeCallsign
+}) => {
   const [avatarId, setAvatarId] = useState('default');
   const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
 
@@ -35,12 +46,6 @@ const IdentityCard: React.FC<IdentityCardProps> = ({ currentUser, callsign, pass
       : 100;
 
   const AvatarIcon = AVATAR_OPTIONS.find(a => a.id === avatarId)?.icon || User;
-  
-  // Lucide icons need to be dynamically rendered or passed, simplistic approach for now:
-  // We can't easily map the Rank icon string back to a component without the map in this file.
-  // For simplicity in this extracted component, we'll assume a generic icon or pass it, 
-  // but to keep it self-contained, let's just use a placeholder or import the icon map if needed.
-  // Let's rely on the visual Rank Name mostly.
 
   return (
     <div className={`flex flex-col h-full min-h-0 border-2 border-slate-700 bg-slate-900/80 rounded-sm relative overflow-hidden ${className}`}>
@@ -71,8 +76,23 @@ const IdentityCard: React.FC<IdentityCardProps> = ({ currentUser, callsign, pass
                     </div>
                 )}
             </div>
+            
             <h2 className="mt-4 text-xl font-bold text-white uppercase tracking-wider">{currentUser}</h2>
-            <span className="text-sm text-emerald-500 font-bold font-mono">"{callsign}"</span>
+            
+            <div className="flex flex-col items-center mt-2 group">
+                <span className="text-sm text-emerald-500 font-bold font-mono tracking-wider">"{callsign}"</span>
+                
+                {!isReadOnly && onChangeCallsign && (
+                    <button 
+                        onClick={onChangeCallsign}
+                        className="mt-1 flex items-center gap-1.5 px-2 py-1 bg-slate-800 border border-slate-700 hover:border-emerald-500 rounded-sm group/btn transition-all"
+                        title="Vaihda radiotunnus"
+                    >
+                        <RefreshCw size={10} className="text-slate-400 group-hover/btn:text-emerald-500" />
+                        <span className="text-[10px] font-mono text-slate-500 group-hover/btn:text-emerald-500 font-bold uppercase">VAIHDA</span>
+                    </button>
+                )}
+            </div>
 
             {/* Avatar Selection Modal */}
             <AnimatePresence>
@@ -141,10 +161,22 @@ const IdentityCard: React.FC<IdentityCardProps> = ({ currentUser, callsign, pass
             </div>
         </div>
 
-        {/* Footer Deco */}
+        {/* Footer / Logout */}
+        {onLogout ? (
+             <div className="p-3 bg-slate-950 border-t border-slate-800">
+                <button 
+                    onClick={onLogout}
+                    className="w-full flex items-center justify-center gap-2 py-2 border border-slate-700 hover:border-rose-500 hover:bg-rose-900/10 text-slate-400 hover:text-rose-400 transition-colors rounded-sm text-xs font-bold uppercase tracking-wider"
+                >
+                    <LogOut size={14} />
+                    Kirjaudu ulos
+                </button>
+             </div>
+        ) : (
             <div className="p-2 bg-slate-950 text-center border-t border-slate-800">
-            <span className="text-[9px] text-slate-600 font-mono tracking-[0.2em]">CLASSIFIED // EYES ONLY</span>
-        </div>
+                <span className="text-[9px] text-slate-600 font-mono tracking-[0.2em]">CLASSIFIED // EYES ONLY</span>
+            </div>
+        )}
     </div>
   );
 };

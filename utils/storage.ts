@@ -4,8 +4,10 @@ import { INITIAL_QUESTION_BANK } from '../constants';
 
 const KEYS = {
   USERS: 'radiopartio_users',
+  LAST_USER: 'radiopartio_last_user',
+  LAST_CALLSIGN: 'radiopartio_last_callsign', // New persistence key
   HISTORY: 'radiopartio_history',
-  QUESTIONS: 'radiopartio_questions_v5', // Updated to v5 for Mayday removal
+  QUESTIONS: 'radiopartio_questions_v5', 
   AVATARS: 'radiopartio_avatars',
 };
 
@@ -18,12 +20,37 @@ export const StorageUtils = {
 
   addUser: (name: string) => {
     const users = StorageUtils.getUsers();
-    // Check for existence case-insensitively
     const exists = users.some(u => u.toLowerCase() === name.toLowerCase());
     if (!exists) {
       users.push(name);
       localStorage.setItem(KEYS.USERS, JSON.stringify(users));
     }
+  },
+
+  // --- SESSION PERSISTENCE ---
+  getLastUser: (): string | null => {
+      return localStorage.getItem(KEYS.LAST_USER);
+  },
+
+  setLastUser: (name: string) => {
+      localStorage.setItem(KEYS.LAST_USER, name);
+  },
+
+  getLastCallsign: (): string | null => {
+      return localStorage.getItem(KEYS.LAST_CALLSIGN);
+  },
+
+  setLastCallsign: (callsign: string) => {
+      localStorage.setItem(KEYS.LAST_CALLSIGN, callsign);
+  },
+
+  clearSession: () => {
+      localStorage.removeItem(KEYS.LAST_USER);
+      localStorage.removeItem(KEYS.LAST_CALLSIGN);
+  },
+  
+  clearCallsign: () => {
+      localStorage.removeItem(KEYS.LAST_CALLSIGN);
   },
 
   // --- AVATARS ---
@@ -56,11 +83,10 @@ export const StorageUtils = {
     return StorageUtils.getHistory().filter(h => h.user === name);
   },
 
-  // --- QUESTIONS (Editable) ---
+  // --- QUESTIONS ---
   getQuestionBank: (): QuestionCategory[] => {
     const data = localStorage.getItem(KEYS.QUESTIONS);
     if (!data) {
-      // Initialize with default constants if empty
       localStorage.setItem(KEYS.QUESTIONS, JSON.stringify(INITIAL_QUESTION_BANK));
       return INITIAL_QUESTION_BANK;
     }
@@ -71,7 +97,7 @@ export const StorageUtils = {
     localStorage.setItem(KEYS.QUESTIONS, JSON.stringify(data));
   },
 
-  // --- RAW DATA EXPORT/IMPORT (For Admin) ---
+  // --- RAW DATA EXPORT/IMPORT ---
   exportAllData: () => {
     return {
       users: StorageUtils.getUsers(),
